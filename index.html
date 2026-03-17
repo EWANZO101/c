@@ -138,6 +138,8 @@
     .contact a{color:var(--accent);text-decoration:none;}
     .contact a:hover{text-decoration:underline;}
 
+    @keyframes flash{0%{opacity:1}40%{opacity:.4}100%{opacity:1}}
+    .flash-update{animation:flash .4s ease;}
     @media(max-width:380px){
       .ring-rel,.rsv{width:90px;height:90px;}
       .rn{font-size:1.4rem;}
@@ -266,6 +268,10 @@
         el.appendChild(lbl);
         g.appendChild(el);
       }
+      // Flash the grid to show live update
+      g.classList.remove('flash-update');
+      void g.offsetWidth;
+      g.classList.add('flash-update');
     }
 
     // ── Fetch + update UI ─────────────────────────────────────────────────────
@@ -291,7 +297,9 @@
           ssFree.className = 'ss full-box';
           nFreeEl.style.color = 'var(--danger)';
         }
-        document.getElementById('lastUpdate').textContent = `Updated ${timeStr}`;
+        const ldot = document.querySelector('.ldot');
+        ldot.style.background = 'var(--success)';
+        document.getElementById('lastUpdate').textContent = `Live · ${timeStr}`;
 
         const panel  = document.getElementById('livePanel');
         const msg    = document.getElementById('liveMsg');
@@ -323,16 +331,17 @@
         }
 
       } catch (e) {
-        document.getElementById('lastUpdate').textContent = `Error at ${timeStr} — retrying`;
+        document.querySelector('.ldot').style.background = 'var(--danger)';
+        document.getElementById('lastUpdate').textContent = `Retrying at ${timeStr}…`;
         document.getElementById('liveMsg').className = 'live-msg connecting';
         document.getElementById('liveMsg').innerHTML = '<span>📡</span><span>Reconnecting to slot server…</span>';
       }
     }
 
-    // Initial render + start polling every 5s
-    renderGrid(MAX_S); // assume full at start
+    // Start live polling immediately — no delay
+    renderGrid(MAX_S);
     fetchSlots();
-    pollTimer = setInterval(fetchSlots, 5000);
+    pollTimer = setInterval(fetchSlots, 3000);
   </script>
 </body>
 </html>
