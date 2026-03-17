@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cioda's Commissions — High Traffic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0c0c12;--surface:#13131c;--card:#1a1a24;--border:#2a2a38;
+      --accent:#c084fc;--accent-g:rgba(192,132,252,0.12);
+      --gold:#f59e0b;--text:#e8e6f0;--muted:#9694a8;--dim:#5f5d72;
+      --danger:#ef4444;--success:#22c55e;--warning:#f59e0b;
+    }
+    body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;
+         min-height:100vh;display:flex;flex-direction:column;
+         align-items:center;justify-content:center;padding:1.25rem;overflow-x:hidden;}
+
+    /* BG */
+    .bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+    .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.07;}
+    .orb1{width:500px;height:500px;background:#a855f7;top:-150px;left:-150px;animation:d1 14s ease-in-out infinite;}
+    .orb2{width:400px;height:400px;background:#f59e0b;bottom:-120px;right:-120px;animation:d2 18s ease-in-out infinite;}
+    .orb3{width:280px;height:280px;background:#6366f1;top:50%;left:50%;animation:d3 11s ease-in-out infinite;}
+    @keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,40px)}}
+    @keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
+    @keyframes d3{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-40%,-60%)}}
+
+    /* Card */
+    .card{position:relative;z-index:1;background:var(--card);border:1px solid var(--border);
+          border-radius:22px;padding:clamp(1.75rem,5vw,3rem);width:100%;max-width:560px;
+          text-align:center;animation:popIn .55s cubic-bezier(0.34,1.4,0.64,1) both;
+          box-shadow:0 0 80px rgba(192,132,252,.06);}
+    @keyframes popIn{from{opacity:0;transform:scale(.9) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+    /* Icon */
+    .icon{font-size:clamp(3rem,9vw,4.5rem);margin-bottom:1rem;
+          animation:bob 3s ease-in-out infinite;display:block;}
+    @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+
+    /* Stars */
+    .stars{font-size:1rem;letter-spacing:.25em;color:var(--gold);margin-bottom:.75rem;
+           display:block;animation:twinkle 3s ease-in-out infinite;}
+    @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.5}}
+
+    /* Status badge */
+    .badge{display:inline-flex;align-items:center;gap:.45rem;
+           background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+           color:#fca5a5;border-radius:999px;padding:.3rem .9rem;
+           font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;
+           letter-spacing:.06em;margin-bottom:1.5rem;}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--danger);
+         animation:pulse 1.5s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.55)}}
+
+    /* Typography */
+    h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,5vw,2.2rem);font-weight:700;
+       background:linear-gradient(135deg,#e8e6f0 0%,#c084fc 55%,#f59e0b 100%);
+       -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+       margin-bottom:.5rem;line-height:1.2;}
+    .sub{font-size:clamp(.9rem,2.5vw,1.05rem);color:var(--muted);font-style:italic;
+         line-height:1.6;margin-bottom:1.75rem;}
+
+    /* ── COUNTDOWN RING ── */
+    .ring-wrap{display:flex;justify-content:center;margin-bottom:1.5rem;}
+    .ring-rel{position:relative;width:120px;height:120px;}
+    .ring-svg{transform:rotate(-90deg);width:120px;height:120px;}
+    .ring-bg{fill:none;stroke:#1e1e2e;stroke-width:7;}
+    .ring-fill{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;
+               stroke-dasharray:339;transition:stroke-dashoffset 1s linear,stroke .5s;}
+    .ring-fill.urgent{stroke:var(--danger);}
+    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;
+                 align-items:center;justify-content:center;font-family:'Cinzel',serif;pointer-events:none;}
+    .ring-mins{font-size:2rem;font-weight:700;color:var(--accent);line-height:1;transition:color .5s;}
+    .ring-mins.urgent{color:var(--danger);}
+    .ring-lbl{font-size:.58rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-top:.1rem;}
+
+    /* ── LIVE SLOT PANEL ── */
+    .slot-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+                padding:1.1rem;margin-bottom:1.5rem;}
+    .slot-title{font-family:'Cinzel',serif;font-size:.72rem;color:var(--muted);
+                letter-spacing:.08em;text-transform:uppercase;margin-bottom:.85rem;
+                display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);
+              animation:pulse 2s ease-in-out infinite;display:inline-block;}
+    .slot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem;margin-bottom:.75rem;}
+    .slot-box{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+              font-size:1.1rem;transition:all .3s;border:2px solid transparent;}
+    .slot-box.used{background:#1e1e2e;border-color:#2a2a38;}
+    .slot-box.free{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);}
+    .slot-counts{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);}
+    .slot-counts span{display:flex;align-items:center;gap:.3rem;}
+    .slot-counts strong{color:var(--text);}
+
+    /* Queue full state */
+    .queue-state{font-size:.85rem;margin-top:.6rem;font-style:italic;}
+    .queue-state.full{color:#fca5a5;}
+    .queue-state.available{color:#86efac;}
+
+    /* Info grid */
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+               gap:.7rem;margin-bottom:1.75rem;}
+    .info-box{background:var(--surface);border:1px solid var(--border);
+              border-radius:12px;padding:.9rem .65rem;}
+    .info-icon{font-size:1.4rem;margin-bottom:.4rem;display:block;}
+    .info-title{font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;
+                color:var(--text);margin-bottom:.2rem;}
+    .info-desc{font-size:.78rem;color:var(--muted);font-style:italic;line-height:1.4;}
+
+    /* CTA button */
+    .btn-cta{display:inline-flex;align-items:center;gap:.5rem;
+             background:var(--accent);color:#fff;border:none;border-radius:10px;
+             padding:.75rem 1.75rem;font-family:'Cinzel',serif;font-size:.9rem;
+             font-weight:700;letter-spacing:.04em;cursor:pointer;text-decoration:none;
+             transition:all .2s;margin-bottom:1.5rem;}
+    .btn-cta:hover{background:#a855f7;box-shadow:0 0 30px var(--accent-g);transform:translateY(-2px);}
+    .btn-cta:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+    /* Divider */
+    hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0;}
+
+    /* Contact */
+    .contact{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;
+             font-size:.85rem;color:var(--muted);}
+    .contact a{color:var(--accent);text-decoration:none;}
+    .contact a:hover{text-decoration:underline;}
+
+    @media(max-width:380px){
+      .info-grid{grid-template-columns:1fr 1fr;}
+      .ring-rel,.ring-svg{width:100px;height:100px;}
+      .ring-mins{font-size:1.6rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  </div>
+
+  <div class="card">
+    <span class="stars">⭐ ✨ ⭐</span>
+    <span class="icon">🌊</span>
+
+    <div class="badge"><div class="dot"></div>HIGH TRAFFIC — OVERFLOW ACTIVE</div>
+
+    <h1>Queue is Full!</h1>
+    <p class="sub">
+      All commission slots are taken right now.<br>
+      You'll be sent back automatically in <strong id="timeLabel" style="color:var(--accent);-webkit-text-fill-color:var(--accent);">5:00</strong>.
+    </p>
+
+    <!-- Countdown ring -->
+    <div class="ring-wrap">
+      <div class="ring-rel">
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="54"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54" stroke-dashoffset="0"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-mins" id="ringDisp">5:00</div>
+          <div class="ring-lbl" id="ringLbl">remaining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live slots panel -->
+    <div class="slot-panel">
+      <div class="slot-title">
+        <div class="live-dot"></div>
+        LIVE SLOT STATUS · updates every 10s
+      </div>
+      <div class="slot-grid" id="slotGrid">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="slot-counts">
+        <span>🎨 <strong id="onFormCount">–</strong> on form</span>
+        <span>⏳ <strong id="waitingCount">–</strong> waiting</span>
+        <span>✅ <strong id="freeCount">–</strong> free</span>
+      </div>
+      <div class="queue-state" id="queueState"></div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-grid">
+      <div class="info-box">
+        <span class="info-icon">⏱️</span>
+        <div class="info-title">Auto-Return</div>
+        <div class="info-desc">You'll be sent back to the queue when the timer ends.</div>
+      </div>
+      <div class="info-box">
+        <span class="info-icon">💬</span>
+        <div class="info-title">Discord</div>
+        <div class="info-desc">DM <strong style="color:var(--text);">totallynotcioda</strong> to be notified.</div>
+      </div>
+      <div class="info-box">
+        <span class="info-icon">🔒</span>
+        <div class="info-title">IP Hold</div>
+        <div class="info-desc">Your spot is held for 5 mins. Returning early won't work.</div>
+      </div>
+    </div>
+
+    <!-- CTA: try when free slots appear -->
+    <a href="https://order.ciodrawz.space/queue/waiting" class="btn-cta" id="tryBtn">
+      🔄 Try the Queue Now
+    </a>
+
+    <hr>
+    <div class="contact">
+      <span>💬 <strong style="color:var(--text);">totallynotcioda</strong></span>
+      <span>✉️ <a href="mailto:ciodrawz@opslabsystems.cloud">ciodrawz@opslabsystems.cloud</a></span>
+      <span>🌐 <a href="https://order.ciodrawz.space">Main Site</a></span>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_SECS  = 300;  // 5 minutes
+    const MAX_SLOTS   = 5;
+    const API_URL     = 'https://order.ciodrawz.space/api/slots';
+    const QUEUE_URL   = 'https://order.ciodrawz.space/queue/waiting';
+    const CIRCUMF     = 339.3; // 2 * PI * 54
+
+    let secsLeft = TOTAL_SECS;
+    let liveSlots = { free_slots: 0, on_form: 0, waiting: 0, queue_full: true };
+
+    // ── Countdown ────────────────────────────────────────────────────────────
+    function fmtTime(s) {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return `${m}:${sec.toString().padStart(2,'0')}`;
+    }
+
+    function tickCountdown() {
+      if (secsLeft <= 0) {
+        window.location.href = QUEUE_URL;
+        return;
+      }
+      secsLeft--;
+      const label = fmtTime(secsLeft);
+      document.getElementById('timeLabel').textContent = label;
+      document.getElementById('ringDisp').textContent  = label;
+
+      // Ring fill
+      const pct    = secsLeft / TOTAL_SECS;
+      const offset = (1 - pct) * CIRCUMF;
+      document.getElementById('ringFill').style.strokeDashoffset = offset;
+
+      // Urgent colour when <60s
+      const urgent = secsLeft < 60;
+      document.getElementById('ringFill').classList.toggle('urgent', urgent);
+      document.getElementById('ringDisp').classList.toggle('urgent', urgent);
+      if (secsLeft <= 0) document.getElementById('ringLbl').textContent = 'redirecting…';
+    }
+
+    setInterval(tickCountdown, 1000);
+
+    // ── Render slot boxes ─────────────────────────────────────────────────────
+    function renderSlots(data) {
+      const grid = document.getElementById('slotGrid');
+      grid.innerHTML = '';
+      for (let i = 0; i < MAX_SLOTS; i++) {
+        const used = i < data.on_form;
+        const box  = document.createElement('div');
+        box.className = 'slot-box ' + (used ? 'used' : 'free');
+        box.textContent = used ? '🎨' : '✅';
+        box.title = used ? 'In use' : 'Available';
+        grid.appendChild(box);
+      }
+    }
+
+    // ── Fetch live slot data ──────────────────────────────────────────────────
+    async function fetchSlots() {
+      try {
+        const res  = await fetch(API_URL);
+        const data = await res.json();
+        liveSlots  = data;
+
+        renderSlots(data);
+        document.getElementById('onFormCount').textContent  = data.on_form;
+        document.getElementById('waitingCount').textContent = data.waiting;
+        document.getElementById('freeCount').textContent    = data.free_slots;
+
+        const stateEl = document.getElementById('queueState');
+        if (data.free_slots > 0 && !data.queue_full) {
+          stateEl.className = 'queue-state available';
+          stateEl.textContent = `✅ ${data.free_slots} slot${data.free_slots > 1 ? 's' : ''} just opened — click the button to join!`;
+        } else if (data.queue_full) {
+          stateEl.className = 'queue-state full';
+          stateEl.textContent = `Queue still full (${data.waiting} waiting). Sit tight.`;
+        } else {
+          stateEl.className = 'queue-state available';
+          stateEl.textContent = `${data.free_slots} slot${data.free_slots > 1 ? 's' : ''} free but queue is forming — try joining!`;
+        }
+
+      } catch(e) {
+        document.getElementById('queueState').textContent = 'Checking slot status…';
+      }
+    }
+
+    // ── Boot ─────────────────────────────────────────────────────────────────
+    renderSlots({ on_form: MAX_SLOTS, free_slots: 0, waiting: 0 }); // initial full state
+    fetchSlots();
+    setInterval(fetchSlots, 10000); // live update every 10s
+  </script>
+</body>
+</html>
